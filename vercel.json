@@ -1,0 +1,16 @@
+{
+  "crons": [
+    { "path": "/api/cron/expire-ads",           "schedule": "0 19 * * *"  },
+    { "path": "/api/cron/fuel-prices",          "schedule": "0 19 * * *"  },
+    { "path": "/api/cron/seo-refresh",          "schedule": "0 20 * * *"  },
+    { "path": "/api/cron/rates",                "schedule": "0 21 * * *"  },
+    { "path": "/api/cron/new-vehicles?slice=0", "schedule": "15 19 * * *" },
+    { "path": "/api/cron/new-vehicles?slice=1", "schedule": "18 19 * * *" },
+    { "path": "/api/cron/new-vehicles?slice=2", "schedule": "21 19 * * *" },
+    { "path": "/api/cron/new-vehicles?slice=3", "schedule": "24 19 * * *" },
+    { "path": "/api/cron/new-vehicles?slice=4", "schedule": "27 19 * * *" },
+    { "path": "/api/cron/new-vehicles?slice=5", "schedule": "30 19 * * *" },
+    { "path": "/api/cron/new-vehicles?slice=6", "schedule": "33 19 * * *" },
+    { "path": "/api/blog/ai-generate",          "schedule": "0 6 * * *"   }
+  ]
+}

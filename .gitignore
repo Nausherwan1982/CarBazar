@@ -1,9 +1,11 @@
-node_modules
-dist
+node_modules/
+.next/
+.env.local
 .env
-.env.*
-!.env.example
-data.json
-*.vsix
-*.msi
-Attached Element Context from Integrated.txt
+*.log
+.DS_Store
+dist/
+android/
+ios/
+out/
+*.tsbuildinfo

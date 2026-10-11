@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  background: #f5f7fa;
+  color: #0b1f3a;
+  font-family: system-ui, -apple-system, "Segoe UI", "Noto Nastaliq Urdu", sans-serif;
+}
+
+[dir="rtl"] {
+  font-family: "Noto Nastaliq Urdu", "Jameel Noori Nastaleeq", serif;
+  line-height: 2;
+}

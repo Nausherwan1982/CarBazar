@@ -1,0 +1,249 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String?  @unique
+  phone         String   @unique
+  name          String?
+  passwordHash  String?
+  role          String   @default("user")
+  verified      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  ads           Ad[]
+  forumThreads  ForumThread[]
+  forumReplies  ForumReply[]
+}
+
+model Category {
+  id       String    @id @default(cuid())
+  slug     String    @unique
+  name     String
+  parentId String?
+  parent   Category? @relation("parent", fields: [parentId], references: [id])
+  children Category[] @relation("parent")
+  ads      Ad[]
+}
+
+model Brand {
+  id          String  @id @default(cuid())
+  name        String  @unique
+  logo        String?
+  vehicleType String
+  origin      String?
+  models      CarModel[]
+  ads         Ad[]
+}
+
+model CarModel {
+  id          String   @id @default(cuid())
+  name        String
+  brandId     String
+  brand       Brand    @relation(fields: [brandId], references: [id])
+  vehicleType String
+  bodyType    String?
+  pricePKR    Int?
+  specs       Json?
+  isNew       Boolean  @default(true)
+  updatedAt   DateTime @updatedAt
+  ads         Ad[]
+  history     CatalogHistory[]
+  @@unique([brandId, name])
+}
+
+model CatalogHistory {
+  id          String   @id @default(cuid())
+  modelId     String
+  model       CarModel @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  oldPricePKR Int?
+  newPricePKR Int?
+  oldSpecs    Json?
+  newSpecs    Json?
+  changeType  String
+  createdAt   DateTime @default(now())
+  @@index([modelId, createdAt])
+}
+
+model Ad {
+  id             String   @id @default(cuid())
+  title          String
+  description    String
+  price          Int
+  year           Int
+  kmDriven       Int?
+  fuelType       String?
+  transmission   String?
+  bodyType       String?
+  color          String?
+  registeredCity String?
+  categoryId     String
+  category       Category @relation(fields: [categoryId], references: [id])
+  brandId        String?
+  modelId        String?
+  brand          Brand?   @relation(fields: [brandId], references: [id])
+  model          CarModel? @relation(fields: [modelId], references: [id])
+  images         String[]
+  sellerId       String
+  seller         User     @relation(fields: [sellerId], references: [id])
+  city           String
+  status         String   @default("active")
+  isPremium      Boolean  @default(false)
+  premiumUntil   DateTime?
+  views          Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  expiresAt      DateTime
+  payments       Payment[]
+  seoTitle       String?
+  seoDescription String?
+  seoTags        String[]
+  @@index([categoryId, status, isPremium, createdAt])
+  @@index([city, brandId, year, price])
+}
+
+model Payment {
+  id          String   @id @default(cuid())
+  adId        String
+  ad          Ad       @relation(fields: [adId], references: [id])
+  userId      String
+  amount      Int
+  gateway     String
+  txnRef      String   @unique
+  status      String   @default("pending")
+  premiumDays Int
+  createdAt   DateTime @default(now())
+  rawResponse Json?
+}
+
+model FuelPrice {
+  id        String   @id @default(cuid())
+  fuelType  String
+  price     Float
+  effective DateTime @default(now())
+  city      String?
+}
+
+model FinanceRate {
+  id        String   @id @default(cuid())
+  bank      String   @unique
+  minRate   Float
+  maxRate   Float
+  tenureMax Int
+  updatedAt DateTime @updatedAt
+}
+
+model InsuranceRate {
+  id              String   @id @default(cuid())
+  company         String   @unique
+  vehicleCategory String
+  minPremium      Float
+  ratePercent     Float
+  updatedAt       DateTime @updatedAt
+}
+
+model Chat {
+  id         String   @id @default(cuid())
+  adId       String
+  senderId   String
+  receiverId String
+  message    String
+  createdAt  DateTime @default(now())
+}
+
+model ForumThread {
+  id        String   @id @default(cuid())
+  title     String
+  slug      String   @unique
+  category  String
+  body      String
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+  views     Int      @default(0)
+  replies   ForumReply[]
+}
+
+model ForumReply {
+  id        String   @id @default(cuid())
+  threadId  String
+  thread    ForumThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  body      String
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model BlogPost {
+  id             String   @id @default(cuid())
+  title          String
+  slug           String   @unique
+  cover          String?
+  excerpt        String
+  body           String
+  category       String
+  tags           String[]
+  seoTitle       String?
+  seoDescription String?
+  published      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model RentCar {
+  id           String   @id @default(cuid())
+  title        String
+  city         String
+  vehicleType  String
+  withDriver   Boolean  @default(false)
+  pricePerDay  Int
+  images       String[]
+  features     String[]
+  contactPhone String
+  ownerId      String
+  status       String   @default("active")
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  @@index([city, vehicleType, status])
+}
+
+model Mechanic {
+  id            String   @id @default(cuid())
+  shopName      String
+  ownerName     String
+  city          String
+  area          String
+  services      String[]
+  mobileService Boolean  @default(false)
+  priceRange    String
+  rating        Float    @default(0)
+  reviewCount   Int      @default(0)
+  images        String[]
+  phone         String
+  description   String
+  status        String   @default("active")
+  createdAt     DateTime @default(now())
+  @@index([city, status])
+}
+
+model OtpCode {
+  id        String   @id @default(cuid())
+  phone     String
+  code      String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String?
+  endpoint  String   @unique
+  data      Json
+  createdAt DateTime @default(now())
+  @@index([userId])
+}
